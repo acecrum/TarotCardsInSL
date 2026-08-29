@@ -410,4 +410,8 @@
       </Reference>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="References\" />
+    </ItemGroup>
+
 </Project>
