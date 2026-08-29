@@ -1,16 +1,18 @@
 bin/
 obj/
 
+# Rider
 .idea/
 *.DotSettings.user
 
-*.log
-*.tmp
-
+# Visual Studio
 .vs/
 *.user
 *.suo
 *.csproj.user
+
+*.log
+*.tmp
 
 .env
 .env.*
