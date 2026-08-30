@@ -3,6 +3,7 @@ using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Handlers;
 using LabApi.Features.Wrappers;
 using MEC;
+using PlayerRoles;
 using PlayerStatsSystem;
 using RueI.API;
 using RueI.API.Elements;
@@ -36,11 +37,13 @@ public sealed class Lovers(Config config) : CustomCard
 
         var linkActive = true;
         var syncingEffects = false;
-        var oldHPA = player.Health;
-        var oldHPB = playerB.Health;
+        var syncingHP = false;
+        var HPA = player.ReferenceHub.playerStats.GetModule<HealthStat>();
+        var HPB = playerB.ReferenceHub.playerStats.GetModule<HealthStat>();
 
+        HPA.OnStatChange += HPAChanged;
+        HPB.OnStatChange += HPBChanged;
         PlayerEvents.Dying += ohshittheydied;
-        PlayerEvents.Hurt += THEYFUCKINSHOOTINME;
 
         var displayA = RueDisplay.Get(player);
         {displayA.Show(new BasicElement(200, $"<b><size=30><color={GlowColor.ToHex()}>You are now linked with {playerB.DisplayName}!</color></size></b>"), 3f);}
@@ -58,27 +61,53 @@ public sealed class Lovers(Config config) : CustomCard
             player.Health = player.MaxHealth;
             playerB.Health = playerB.MaxHealth;
         }
-        Timing.RunCoroutine(HPLink());
         return;
 
-        void THEYFUCKINSHOOTINME(PlayerHurtEventArgs ev)
+        void HPAChanged(float oldHP, float newHP)
         {
-            if (player.IsSCP || playerB.IsSCP) return;
-            if (ev.Player != player && ev.Player != playerB) return;
+            if (!linkActive || syncingHP) return;
             
-            var other = ev.Player == player ? playerB : player;
-            if (ev.DamageHandler is not StandardDamageHandler damageHandler) return;
-            var damage = damageHandler.DealtHealthDamage;
+            var difference = newHP - oldHP;
+            if (Mathf.Approximately(difference, 0)) return;
             
-            if (damage <= 0) return;
+            syncingHP = true;
 
-            other.Health -= damage;
+            try
+            {
+                playerB.Health = Mathf.Clamp(playerB.Health + difference, 0f, playerB.MaxHealth);
+            }
+            finally
+            {
+                syncingHP = false;
+            }
         }
+        
+        void HPBChanged(float oldHP, float newHP)
+        {
+            if (!linkActive || syncingHP) return;
+            
+            var difference = newHP - oldHP;
+            if (Mathf.Approximately(difference, 0)) return;
+            
+            syncingHP = true;
+
+            try
+            {
+                player.Health = Mathf.Clamp(player.Health + difference, 0f, player.MaxHealth);
+            }
+            finally
+            {
+                syncingHP = false;
+            }
+        }
+
+        
         
         void ohshittheydied(PlayerDyingEventArgs ev)
         {
             if (!linkActive) return;
             if (ev.Player != player && ev.Player != playerB) return;
+            if (player.Role == RoleTypeId.Scp0492 && playerB.Role != RoleTypeId.Scp0492|| playerB.Role == RoleTypeId.Scp0492 && playerB.Role != RoleTypeId.Scp0492) return;
             
             var other = ev.Player == player ? playerB : player;
             linkActive = false;
@@ -184,37 +213,6 @@ public sealed class Lovers(Config config) : CustomCard
             effectB.ServerSetState(intensity, duration);
         }
 
-        IEnumerator<float> HPLink()
-        {
-            if (playerB.IsSCP || player.IsSCP) yield break;
-            while (linkActive && player.IsAlive && playerB.IsAlive)
-            {
-                var currentHPA = player.Health;
-                var currentHPB = playerB.Health;
-
-                if (currentHPA > oldHPA)
-                {
-                    var healedAmoumt = currentHPA - oldHPA;
-                    
-                    playerB.Health = Mathf.Clamp(playerB.Health + healedAmoumt, 0f, playerB.MaxHealth);
-                }
-                
-                if (currentHPB > oldHPB)
-                {
-                    var healedAmoumt = currentHPB - oldHPB;
-                    
-                    player.Health = Mathf.Clamp(player.Health + healedAmoumt, 0f, player.MaxHealth);
-                }
-                
-                playerB.Health = player.Health;
-                
-                oldHPA = player.Health;
-                oldHPB = playerB.Health;
-                
-                yield return Timing.WaitForSeconds(0.1f);
-            }
-        }
-
         Player? OoooShiTheyInLove(Player playerA)
         {
             const float maxDistance = 5f;
@@ -246,7 +244,8 @@ public sealed class Lovers(Config config) : CustomCard
             
             PlayerEvents.Dying -= ohshittheydied;
             PlayerEvents.UpdatedEffect -= updatedeffect;
-            PlayerEvents.Hurt -= THEYFUCKINSHOOTINME;
+            HPA.OnStatChange -= HPAChanged;
+            HPB.OnStatChange -= HPBChanged;
         }
     }
 }
