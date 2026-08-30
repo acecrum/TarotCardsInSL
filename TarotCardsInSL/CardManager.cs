@@ -49,7 +49,6 @@ public class CardManager(Config config)
             if (!TryGiveCard(player, card)) return;
             pickup.Destroy();
         };
-        data.Interactable = interactable;
     }
     
     public Pickup SpawnCardInLocker(CustomCard card, LockerChamber chamber)

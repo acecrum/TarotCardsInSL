@@ -31,10 +31,10 @@ public sealed class HighPriestess(Config config) : CustomCard
         var oldGogglesIntensity = existingGoggles?.Intensity ?? 0;
         player.EnableEffect<Scp1344>(1, 8);
         
-        Timing.RunCoroutine(HermitLoop(player));
+        Timing.RunCoroutine(PreistessLoop(player));
         
         
-        IEnumerator<float> HermitLoop(Player hermit)
+        IEnumerator<float> PreistessLoop(Player hermit)
         {
             const float radius = 10f;
             const byte speedAmount = 35;

@@ -62,14 +62,14 @@ public class ForceTarotMaster : ICommand, IUsageProvider
             return false;
         }
         
-        if (target != null && TarotPlugin.SubclassManager != null && TarotPlugin.SubclassManager.IsTarotMaster(target))
+        if (TarotPlugin.SubclassManager != null && TarotPlugin.SubclassManager.IsTarotMaster(target))
         {
             response = $"{target.DisplayName} is already a Tarot Master!";
             return false;
         }
         
-        if (target != null) TarotPlugin.SubclassManager?.AssignMaster(target);
-        response = $"Set {target?.DisplayName} as Tarot Master!";
+        TarotPlugin.SubclassManager?.AssignMaster(target);
+        response = $"Set {target.DisplayName} as Tarot Master!";
         return true;
     }
 }

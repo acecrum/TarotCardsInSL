@@ -223,9 +223,9 @@ public sealed class Lovers(Config config) : CustomCard
             Player? closestPlayer = null;
             var closestAngle = float.MaxValue;
 
-            foreach (var playerB in Player.ReadyList)
+            foreach (var b in Player.ReadyList)
             {
-                var direction = playerB.Position - playerA.Camera.position;
+                var direction = b.Position - playerA.Camera.position;
                 var distance = direction.magnitude;
 
                 if (distance > maxDistance) continue;
@@ -235,7 +235,7 @@ public sealed class Lovers(Config config) : CustomCard
                 if (angle >= closestAngle) continue;
                 
                 closestAngle = angle;
-                closestPlayer = playerB;
+                closestPlayer = b;
             }
             return closestPlayer;
         }
