@@ -411,7 +411,15 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="References\" />
+      <Compile Remove="References\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="References\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="References\**" />
     </ItemGroup>
 
 </Project>

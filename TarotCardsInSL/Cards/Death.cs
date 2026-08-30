@@ -1,3 +1,4 @@
+using LabApi.Events;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Handlers;
 using LabApi.Features.Extensions;
@@ -19,10 +20,12 @@ public sealed class Death(Config config) : CustomCard
     public override string Description => "Lay waste to all that oppose you.";
     public override Color GlowColor => new Color32(80, 50, 168, 255);
     public override int SpawnWeight => config.DeathSpawnWeight;
-
+    private readonly Dictionary<string, LabEventHandler<PlayerDyingEventArgs>> _dyingHandlers = new();
+    
     public override void OnGiven(Player player)
     {
         var allowHealing = true;
+        _dyingHandlers[player.UserId] = Dying;
         PlayerEvents.Dying += Dying;
         return;
 
@@ -162,5 +165,11 @@ public sealed class Death(Config config) : CustomCard
             PlayerEvents.UsingItem -= OnUsingItem;
             PlayerEvents.Death -= DeathNotTheCardName;
         }
+    } 
+    public override void OnRemoved(Player player)
+    {
+        if (!_dyingHandlers.TryGetValue(player.UserId, out var handler)) return;
+        PlayerEvents.Dying -= handler;
+        _dyingHandlers.Remove(player.UserId);
     }
 }

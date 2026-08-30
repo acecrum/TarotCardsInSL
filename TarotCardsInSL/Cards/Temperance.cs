@@ -21,12 +21,12 @@ public sealed class Temperance(Config config) : CustomCard
     public override Color GlowColor => Color.green;
     public override int SpawnWeight => config.TemperanceSpawnWeight;
 
-    public override void Activate(Player player)
+    public override void Activate(Player player) // todo: add more effects but these are good imo
     {
         var badEffectString = "";
         var goodEffectString = "";
         
-        switch (UnityEngine.Random.Range(0, 2))
+        switch (UnityEngine.Random.Range(0, 3))
         {
             case 0:
                 player.EnableEffect<Slowness>(20);
@@ -34,6 +34,7 @@ public sealed class Temperance(Config config) : CustomCard
                 break;
             case 1:
                 PlayerEvents.Hurting += DamageTakenIncreased;
+                PlayerEvents.Dying += DeleteThisShitBrah;
                 badEffectString = "Damage Reduction";
                 break;
 
@@ -41,10 +42,29 @@ public sealed class Temperance(Config config) : CustomCard
                 {
                     if (ev.Player != player) return;
                     if (ev.DamageHandler is not StandardDamageHandler damageHandler) return;
+                    damageHandler.Damage *= 1.25f;
                 }
+
+                void DeleteThisShitBrah(PlayerDyingEventArgs ev)
+                {
+                    PlayerEvents.Hurting -= DamageTakenIncreased;
+                    PlayerEvents.Dying -= DeleteThisShitBrah;
+                }
+            case 2:
+                if (player.IsSCP)
+                {
+                    player.MaxHealth *= 0.8f;
+                    player.Heal(player.MaxHealth/5);
+                }
+                else if (player.IsHuman)
+                {
+                    player.MaxHealth *= 0.65f;
+                }
+                badEffectString = "Max HP";
+                break;
         }
 
-        switch (UnityEngine.Random.Range(0, 2))
+        switch (UnityEngine.Random.Range(0, 4))
         {
             case 0:
                 player.EnableEffect<MovementBoost>(20);
@@ -54,6 +74,19 @@ public sealed class Temperance(Config config) : CustomCard
                 player.EnableEffect<DamageReduction>(45);
                 goodEffectString = "Damage Reduction";
                 break;
+            case 2:
+                if (player.IsSCP)
+                {
+                    player.MaxHealth *= 1.2f;
+                    player.Heal(player.MaxHealth/5);
+                }
+                else if (player.IsHuman)
+                {
+                    player.MaxHealth *= 1.35f;
+                }
+                badEffectString = "Max HP";
+                break;
+            
         }
         
         var display = RueDisplay.Get(player);
