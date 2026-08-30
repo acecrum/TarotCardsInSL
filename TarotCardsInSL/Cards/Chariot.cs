@@ -1,4 +1,5 @@
 using CustomPlayerEffects;
+using LabApi.Events;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Handlers;
 using LabApi.Features.Wrappers;
@@ -23,15 +24,15 @@ public sealed class Chariot(Config config) : CustomCard
     public override string Description => "May nothing stand before you.";
     public override Color GlowColor => new Color32(255, 217, 0, 255);
     public override int SpawnWeight => config.ChariotSpawnWeight;
-    
-    
+    private readonly Dictionary<string, LabEventHandler<PlayerDyingEventArgs>> _dyingHandlers = new();
     
     public override void OnGiven(Player player)
     { 
         Player? savedAttacker;
         LightSourceToy? savedLight;
         var revengeSucceeded = false;
-
+        
+        _dyingHandlers[player.UserId] = OnDying;
         PlayerEvents.Dying += OnDying;
         return;
 
@@ -133,5 +134,11 @@ public sealed class Chariot(Config config) : CustomCard
                 player.Kill($"Couldn't kill {savedAttacker.DisplayName} in time.");
             }
         }
+    }
+    public override void OnRemoved(Player player)
+    {
+        if (!_dyingHandlers.TryGetValue(player.UserId, out var handler)) return;
+        PlayerEvents.Dying -= handler;
+        _dyingHandlers.Remove(player.UserId);
     }
 }

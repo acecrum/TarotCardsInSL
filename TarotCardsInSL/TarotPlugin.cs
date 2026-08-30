@@ -39,6 +39,7 @@ public class TarotPlugin : Plugin<Config>
         CardManager.RegisterCard(new Death(Config));
         CardManager.RegisterCard(new World(Config));
         CardManager.RegisterCard(new Temperance(Config));
+        CardManager.RegisterCard(new Devil(Config));
     }
     
     public override void Enable()

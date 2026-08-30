@@ -71,15 +71,9 @@ public sealed class Lovers(Config config) : CustomCard
             if (Mathf.Approximately(difference, 0)) return;
             
             syncingHP = true;
-
-            try
-            {
-                playerB.Health = Mathf.Clamp(playerB.Health + difference, 0f, playerB.MaxHealth);
-            }
-            finally
-            {
-                syncingHP = false;
-            }
+            
+            playerB.Health = Mathf.Clamp(playerB.Health + difference, 0f, playerB.MaxHealth);
+            syncingHP = false;
         }
         
         void HPBChanged(float oldHP, float newHP)
@@ -90,18 +84,10 @@ public sealed class Lovers(Config config) : CustomCard
             if (Mathf.Approximately(difference, 0)) return;
             
             syncingHP = true;
-
-            try
-            {
-                player.Health = Mathf.Clamp(player.Health + difference, 0f, player.MaxHealth);
-            }
-            finally
-            {
-                syncingHP = false;
-            }
+            
+            player.Health = Mathf.Clamp(player.Health + difference, 0f, player.MaxHealth);
+            syncingHP = false;
         }
-
-        
         
         void ohshittheydied(PlayerDyingEventArgs ev)
         {
