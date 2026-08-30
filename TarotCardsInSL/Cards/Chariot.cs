@@ -114,11 +114,9 @@ public sealed class Chariot(Config config) : CustomCard
             {
                 if (savedAttacker == null) yield break;
                 
-                var AttackerDisplay = RueDisplay.Get(savedAttacker);
-                AttackerDisplay.Show(new BasicElement(250, $"<b><size=24><color=red>{player.DisplayName} is hunting you!\n{remaining}</color></size></b>"), 1f);
+                RueDisplay.Get(savedAttacker).Show(new BasicElement(250, $"<b><size=24><color=red>{player.DisplayName} is hunting you!\n{remaining}</color></size></b>"), 1f);
                 
-                var PlayerDisplay = RueDisplay.Get(player);
-                PlayerDisplay.Show(new BasicElement(250, $"<b><size=24><color=red>Kill {savedAttacker.DisplayName}!\n{remaining}</color></size></b>"), 1f);
+                RueDisplay.Get(player).Show(new BasicElement(250, $"<b><size=24><color=red>Kill {savedAttacker.DisplayName}!\n{remaining}</color></size></b>"), 1f);
                 
                 yield return Timing.WaitForSeconds(1f);
                 remaining--;

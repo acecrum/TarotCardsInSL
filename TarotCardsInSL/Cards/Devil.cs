@@ -1,5 +1,12 @@
+using CustomPlayerEffects;
+using LabApi.Events.Arguments.PlayerEvents;
+using LabApi.Events.Handlers;
 using LabApi.Features.Wrappers;
+using MEC;
 using PlayerRoles;
+using PlayerStatsSystem;
+using RueI.API;
+using RueI.API.Elements;
 using UnityEngine;
 
 namespace TarotCardsInSL.Cards;
@@ -19,66 +26,64 @@ public sealed class Devil(Config config) : CustomCard
 
     public override void Activate(Player player)
     {
-        if (player.Team == Team.SCPs)
+        player.EnableEffect<MovementBoost>(35);
+        var existingSpeed = player.ActiveEffects.OfType<MovementBoost>().FirstOrDefault();
+        var oldSpeedIntensity = existingSpeed?.Intensity ?? 0;
+        var existingDR = player.ActiveEffects.OfType<DamageReduction>().FirstOrDefault();
+        var oldDRIntensity = existingDR?.Intensity ?? 0;
+        var timer = 45f;
+        var timerActive = true;
+        
+        Timing.RunCoroutine(Timer());
+        
+        PlayerEvents.Death += OnDeath;
+        PlayerEvents.Hurting += anotherdamagemultwhocouldveguessed;
+        return;
+
+        void OnDeath(PlayerDeathEventArgs ev)
         {
-            switch (UnityEngine.Random.Range(0, 3))
+            if (ev.Player == player)
             {
-                case 0:
-                    player.MaxHealth *= 1.05f;
-                    player.Heal(player.MaxHealth/20);
-                    break;
-                case 1:
-                    player.MaxHumeShield  *= 1.15f;
-                    break;
-                case 2:
-                    if (player.Role == RoleTypeId.Scp106)
-                    {
-                        player.HumeShieldRegenRate *= 1.15f;
-                    }
-                    player.HumeShieldRegenCooldown -= 1.5f;
-                    break;
+                PlayerEvents.Death -= OnDeath;
             }
-        }
-        else 
-        {
-            var grenadePool = new[]
-            { 
-                ItemType.GrenadeHE, ItemType.GrenadeFlash
-            };
-            var keycardPool = new[]
-            {
-                ItemType.KeycardJanitor, ItemType.KeycardScientist, ItemType.KeycardResearchCoordinator, ItemType.KeycardZoneManager, ItemType.KeycardGuard, ItemType.KeycardMTFPrivate
-            };
-            var medicalPool = new[]
-            {
-                ItemType.Medkit, ItemType.Painkillers, ItemType.Adrenaline
-            };
-            var scpItemPool = new[]
-            {
-                ItemType.SCP207, ItemType.AntiSCP207, ItemType.SCP1853, ItemType.SCP500
-            };
-            var randomGrenade = grenadePool[UnityEngine.Random.Range(0, grenadePool.Length)];
-            var randomKeycard = keycardPool[UnityEngine.Random.Range(0, keycardPool.Length)];
-            var randomMedical = medicalPool[UnityEngine.Random.Range(0, medicalPool.Length)];
-            var randomScpItem = scpItemPool[UnityEngine.Random.Range(0, scpItemPool.Length)];
-
-            var items = new[]
-            {
-                randomGrenade, randomKeycard, randomMedical, randomScpItem
-            };
+            if (ev.Attacker != player) return;
             
-            const float radius = 1.5f;
-            var angleStep = 360f/items.Length;
+            timer += 7f;
+            player.EnableEffect<MovementBoost>((byte)(oldSpeedIntensity + 5));
+            oldSpeedIntensity += 5;
+            player.EnableEffect<DamageReduction>((byte)(oldDRIntensity + 10));
+            oldDRIntensity += 10;
+        }
 
-            for (var i = 0; i < items.Length; i++)
+        void anotherdamagemultwhocouldveguessed(PlayerHurtingEventArgs ev)
+        {
+            if (ev.Attacker != player) return;
+            
+            if (ev.DamageHandler is not StandardDamageHandler damageHandler) return;
+            switch (ev.Attacker.Role)
             {
-                var angle = angleStep * i * Mathf.Deg2Rad;
-                var offset = new Vector3(Mathf.Cos(angle) * radius, 0f, Mathf.Sin(angle)  * radius);
+                // for some reason 173, 049, and 106 attacks brick when modified
+                case RoleTypeId.Scp173:
+                    break;
+                case RoleTypeId.Scp106 or RoleTypeId.Scp049 or RoleTypeId.Scp096:
+                    return;
+            }
+            if (ev.Attacker.Role is RoleTypeId.Scp173 or RoleTypeId.Scp049 or RoleTypeId.Scp106) return;
+            damageHandler.Damage *= 1.5f;
+        }
+        
+        IEnumerator<float> Timer()
+        {
+            while (timerActive && timer > 0f)
+            {
+                RueDisplay.Get(player).Show(new BasicElement(165, $"<align=right><color=red><b><size=24>Time left: {timer}</size></b></color></align>"), 1f);
+                timer--;
+                yield return Timing.WaitForSeconds(1f);
+            }
 
-                if (player == null) continue;
-                var spawnPosition = player.Position + offset;
-
-                Pickup.Create(items[i], spawnPosition);
+            if (player.IsAlive)
+            {
+                player.Kill("Couldn't fulfill their promise in darkness.");
             }
         }
     }

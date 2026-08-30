@@ -89,7 +89,6 @@ public sealed class Temperance(Config config) : CustomCard
             
         }
         
-        var display = RueDisplay.Get(player);
-        display.Show(new BasicElement(200, $"<b><size=30><color=red>{badEffectString} down, </color><color=green>{goodEffectString} up.</color></size></b>"), 3f);
+        RueDisplay.Get(player).Show(new BasicElement(200, $"<b><size=30><color=red>{badEffectString} down, </color><color=green>{goodEffectString} up.</color></size></b>"), 3f);
     }
 }
