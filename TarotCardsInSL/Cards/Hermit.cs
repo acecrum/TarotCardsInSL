@@ -15,7 +15,7 @@ public sealed class Hermit(Config config) : CustomCard
     public override ItemType KeycardType => ItemType.KeycardCustomManagement;
     public override (int A, int B, int C) CardPerms => (0, 3, 2);
     public override string TechnicalDescription => "Swaps you to the opposite team.\nSCP's convert up to 2 killed players into 049-2";
-    public override string Description => "May you see what life has to offer";
+    public override string Description => "Traitor.";
     public override Color GlowColor => new Color32(92, 170, 196, 255);
     public override int SpawnWeight => config.HermitSpawnWeight;
 

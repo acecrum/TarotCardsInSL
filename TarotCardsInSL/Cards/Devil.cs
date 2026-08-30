@@ -19,7 +19,7 @@ public sealed class Devil(Config config) : CustomCard
     public override ItemType KeycardType => ItemType.KeycardCustomMetalCase;
     public override (int A, int B, int C) CardPerms => (2, 0, 1);
     public override string TechnicalDescription => "On activation, starts a timer that <color=red>kills you when it reaches 0.</color>\nYou deal 1.5x damage and recieve a 35% Movement Boost\nKilling players regenerates HP and grants further buffs.";
-    public override string Description => "Revel in the power of darkness";
+    public override string Description => "Deal with the Devil.";
     public override Color GlowColor => new Color32(119, 63, 73, 255);
     public override int SpawnWeight => config.DevilSpawnWeight;
 

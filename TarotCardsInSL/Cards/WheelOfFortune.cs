@@ -19,7 +19,7 @@ public sealed class WheelOfFortune(Config config) : CustomCard
     public override ItemType KeycardType => ItemType.KeycardCustomTaskForce;
     public override (int A, int B, int C) CardPerms => (0, 0, 0);
     public override string TechnicalDescription => "Spin the odds and find out...";
-    public override string Description => "Spin the wheel of destiny";
+    public override string Description => "Spin the wheel";
     public override Color GlowColor => new Color32(227, 146, 87, 255);
     public override int SpawnWeight => config.WheelSpawnWeight;
 

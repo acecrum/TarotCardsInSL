@@ -15,7 +15,7 @@ public sealed class Magician(Config config) : CustomCard
     public override ItemType KeycardType => ItemType.KeycardCustomTaskForce;
     public override (int A, int B, int C) CardPerms => (3, 3, 3);
     public override string TechnicalDescription => "Gives the player aimbot for 10 seconds.\n<color=red>Don't get banned</color>";
-    public override string Description => "May you never miss your goal";
+    public override string Description => "THIS MOTHERFUCKER IS RAGE HACKING";
     public override Color GlowColor => new Color32(80, 50, 168, 255);
     public override int SpawnWeight => config.MagicianSpawnWeight;
     public override float GlowIntensity => 0.75f;

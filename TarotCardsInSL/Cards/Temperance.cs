@@ -17,7 +17,7 @@ public sealed class Temperance(Config config) : CustomCard
     public override ItemType KeycardType => ItemType.KeycardCustomTaskForce;
     public override (int A, int B, int C) CardPerms => (0, 3, 0);
     public override string TechnicalDescription => "Decrease one stat to boost another.";
-    public override string Description => "May you be pure in heart.";
+    public override string Description => "Trade with your body.";
     public override Color GlowColor => Color.green;
     public override int SpawnWeight => config.TemperanceSpawnWeight;
 

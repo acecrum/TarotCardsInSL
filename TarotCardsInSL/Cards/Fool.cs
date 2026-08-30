@@ -12,7 +12,7 @@ public sealed class Fool(Config config) : CustomCard
     public override ItemType KeycardType => ItemType.KeycardCustomSite02;
     public override (int A, int B, int C) CardPerms => (0, 0, 0);
     public override string TechnicalDescription => "Grants the player 15% Movement Boost and 20% Damage Reduction\nwhile held";
-    public override string Description => "Where journey begins.";
+    public override string Description => "Your potential, released.";
     public override Color GlowColor => Color.green;
     public override int SpawnWeight => config.FoolSpawnWeight;
     

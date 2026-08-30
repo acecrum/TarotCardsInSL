@@ -12,7 +12,7 @@ public sealed class Hierophant(Config config) : CustomCard
     public override ItemType KeycardType => ItemType.KeycardCustomManagement;
     public override (int A, int B, int C) CardPerms => (1, 0, 2);
     public override string TechnicalDescription => "Adds 50 Hume shield to a human and grants an adrenaline\nSCP's hume shield is fully restored on use";
-    public override string Description => "Two prayers for the lost.";
+    public override string Description => "Your soul is prayed for.";
     public override Color GlowColor => new Color32(133, 235, 255, 255);
     public override int SpawnWeight => config.HierophantSpawnWeight;
 

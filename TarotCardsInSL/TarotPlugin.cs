@@ -7,7 +7,7 @@ namespace TarotCardsInSL;
 public class TarotPlugin : Plugin<Config>
 {
     public override string Name => "TarotCardsInSL";
-    public override string Description => "Adds Tarot Cards from 'The Binding of Isaac' into SL";
+    public override string Description => "Adds Tarot Cards into SL";
     public override string Author => "acecrum";
     public override Version Version => new(1, 0, 0);
     public override Version RequiredApiVersion => new Version(1, 1, 7);
@@ -40,6 +40,7 @@ public class TarotPlugin : Plugin<Config>
         CardManager.RegisterCard(new World(Config));
         CardManager.RegisterCard(new Temperance(Config));
         CardManager.RegisterCard(new Devil(Config));
+        CardManager.RegisterCard(new Tower(Config));
     }
     
     public override void Enable()

@@ -20,7 +20,7 @@ public sealed class Lovers(Config config) : CustomCard
     public override ItemType KeycardType => ItemType.KeycardCustomManagement;
     public override (int A, int B, int C) CardPerms => (2, 0, 1);
     public override string TechnicalDescription => "Use on a nearby teammate to link with them and get buffs\nHealth and effects are shared between the linked players\nSCP's are linked for 1 minute and health is not shared\n<color=red>When a linked player dies, you die as well</color>";
-    public override string Description => "May you prosper and be in good health.";
+    public override string Description => "May you find your true love.";
     public override Color GlowColor => new Color32(133, 255, 135, 255);
     public override int SpawnWeight => config.LoversSpawnWeight;
 
