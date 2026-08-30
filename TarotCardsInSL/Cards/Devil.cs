@@ -27,11 +27,7 @@ public sealed class Devil(Config config) : CustomCard
     public override void Activate(Player player)
     {
         player.EnableEffect<MovementBoost>(35);
-        var existingSpeed = player.ActiveEffects.OfType<MovementBoost>().FirstOrDefault();
-        var oldSpeedIntensity = existingSpeed?.Intensity ?? 0;
-        var existingDR = player.ActiveEffects.OfType<DamageReduction>().FirstOrDefault();
-        var oldDRIntensity = existingDR?.Intensity ?? 0;
-        var timer = 45f;
+        var timer = 25f;
         var timerActive = true;
         
         Timing.RunCoroutine(Timer());
@@ -45,14 +41,32 @@ public sealed class Devil(Config config) : CustomCard
             if (ev.Player == player)
             {
                 PlayerEvents.Death -= OnDeath;
+                Timer().Dispose();
             }
             if (ev.Attacker != player) return;
             
-            timer += 7f;
-            player.EnableEffect<MovementBoost>((byte)(oldSpeedIntensity + 5));
-            oldSpeedIntensity += 5;
-            player.EnableEffect<DamageReduction>((byte)(oldDRIntensity + 10));
-            oldDRIntensity += 10;
+            timer = Mathf.Min(timer + 7f, 60f);
+
+            var currentSpeed = player.ActiveEffects.OfType<MovementBoost>().FirstOrDefault();
+            var currentDR = player.ActiveEffects.OfType<DamageReduction>().FirstOrDefault();
+
+            var speedIntensity = currentSpeed?.Intensity ?? 0;
+            var drIntensity = currentDR?.Intensity ?? 0;
+
+            var newSpeed = Mathf.Min(speedIntensity + 5, 100);
+            var newDR = Mathf.Min(drIntensity + 10, 150);
+
+            player.EnableEffect<MovementBoost>((byte)newSpeed);
+            player.EnableEffect<DamageReduction>((byte)newDR);
+
+            if (!Mathf.Approximately(player.Health, player.MaxHealth))
+            {
+                player.AddRegeneration(25, 2.5f);
+            }
+            else
+            {
+                player.HumeShield += 25f;
+            }
         }
 
         void anotherdamagemultwhocouldveguessed(PlayerHurtingEventArgs ev)
@@ -81,9 +95,15 @@ public sealed class Devil(Config config) : CustomCard
                 yield return Timing.WaitForSeconds(1f);
             }
 
-            if (player.IsAlive)
+            if (player is { IsAlive: true, IsSCP: false })
             {
                 player.Kill("Couldn't fulfill their promise in darkness.");
+            }
+            else if (player.IsSCP)
+            {
+                player.DisableEffect<MovementBoost>();
+                player.DisableEffect<DamageReduction>();
+                player.Health = player.MaxHealth/2;
             }
         }
     }
