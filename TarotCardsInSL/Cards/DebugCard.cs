@@ -1,6 +1,4 @@
 using LabApi.Features.Wrappers;
-using MEC;
-using PlayerRoles;
 using UnityEngine;
 
 namespace TarotCardsInSL.Cards;

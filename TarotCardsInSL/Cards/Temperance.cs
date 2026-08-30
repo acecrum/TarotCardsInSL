@@ -15,7 +15,7 @@ public sealed class Temperance(Config config) : CustomCard
     public override string Name => "XIV | Temperance";
     public override CardType Type => CardType.Active;
     public override ItemType KeycardType => ItemType.KeycardCustomTaskForce;
-    public override (int A, int B, int C) CardPerms => (0, 3, 0);
+    public override (int A, int B, int C) CardPerms => (2, 2, 2);
     public override string TechnicalDescription => "Decrease one stat to boost another.";
     public override string Description => "Trade with your body.";
     public override Color GlowColor => Color.green;
