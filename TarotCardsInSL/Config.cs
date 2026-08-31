@@ -25,6 +25,7 @@ public class Config
     public int TemperanceSpawnWeight { get; set; } = 75;
     public int DevilSpawnWeight  { get; set; } = 25;
     public int TowerSpawnWeight { get; set; } = 65;
+    public int StarsSpawnWeight { get; set; } = 25;
     // this disables card lights from being able to spawn in, disable this if you want people to guess if its a tarot card or not
     // or disable it if your server is already struggling.
     public bool EnableCardLights  { get; set; } = true;
