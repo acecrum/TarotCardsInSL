@@ -183,18 +183,40 @@ public sealed class Stars(Config config) : CustomCard
             delay = 90f;
         }
         
-        PlayerEvents.Hurting += idkwhattonamethisshitanymoreman;
+        PlayerEvents.Hurting += Idkwhattonamethisshitanymoreman;
         
         Timing.CallDelayed(delay, () =>
         {
-            PlayerEvents.Hurting -= idkwhattonamethisshitanymoreman;
+            PlayerEvents.Hurting -= Idkwhattonamethisshitanymoreman;
         });
-        return;
 
-        void idkwhattonamethisshitanymoreman(PlayerHurtingEventArgs ev) 
+        var savedInventory = player.Inventory;
+        
+        if (player.IsHuman)
+        {
+            PlayerEvents.PickingUpItem += Denypickup;
+            player.ClearInventory();
+
+            void Denypickup(PlayerPickingUpItemEventArgs ev)
+            {
+                if  (ev.Player !=  player) return;
+                ev.IsAllowed = false;
+            }
+            
+            Timing.CallDelayed(60f, () =>
+            {
+                PlayerEvents.PickingUpItem -= Denypickup;
+            });
+        }
+        
+        return;
+        
+        void Idkwhattonamethisshitanymoreman(PlayerHurtingEventArgs ev) 
         {
             if (ev.Attacker !=  player) return;
             ev.IsAllowed  = false;
         }
+
+
     }
 }
