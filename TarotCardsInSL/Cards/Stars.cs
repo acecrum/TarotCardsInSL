@@ -1,3 +1,4 @@
+using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Arguments.Scp049Events;
 using LabApi.Events.Arguments.Scp096Events;
 using LabApi.Events.Arguments.Scp106Events;
@@ -6,8 +7,8 @@ using LabApi.Events.Arguments.Scp3114Events;
 using LabApi.Events.Arguments.Scp939Events;
 using LabApi.Events.Handlers;
 using LabApi.Features.Wrappers;
+using MEC;
 using PlayerRoles;
-using PlayerRoles.PlayableScps.Scp096;
 using UnityEngine;
 
 namespace TarotCardsInSL.Cards;
@@ -19,7 +20,7 @@ public sealed class Stars(Config config) : CustomCard
     public override CardType Type => CardType.Active;
     public override ItemType KeycardType => ItemType.KeycardCustomTaskForce;
     public override (int A, int B, int C) CardPerms => (0, 0, 3);
-    public override string TechnicalDescription => "<color=red>Removes every item from the players inventory and disables picking up. After\na minute,</color> replaces them with direct upgrades.\nSCP's abilities and attacking is disabled for 90 seconds instead\nSCP's recieve a speed bonus";
+    public override string TechnicalDescription => "<color=red>Removes every item from the players inventory and disables picking up.</color>\nAfter a minute, replaces them with direct upgrades.\nSCP's abilities and attacking is disabled for 90 seconds instead\nSCP's recieve a buff tailored to each SCP";
     public override string Description => "Let go and find what you need.";
     public override Color GlowColor => new Color32(251, 225, 114, 255);
     public override int SpawnWeight => config.StarsSpawnWeight;
@@ -34,6 +35,13 @@ public sealed class Stars(Config config) : CustomCard
                 Scp049Events.UsingSense += DisableGoodSense;
                 Scp049Events.UsingDoctorsCall += DisableDoctorCall;
                 Scp049Events.StartingResurrection += DisableRes;
+                
+                Timing.CallDelayed(90f, () =>
+                {
+                    Scp049Events.UsingSense -= DisableGoodSense;
+                    Scp049Events.UsingDoctorsCall -= DisableDoctorCall;
+                    Scp049Events.StartingResurrection -= DisableRes;
+                });
                 break;
 
                 void DisableGoodSense(Scp049UsingSenseEventArgs ev)
@@ -61,6 +69,12 @@ public sealed class Stars(Config config) : CustomCard
             {
                 Scp106Events.UsingHunterAtlas += DisableAtlas;
                 Scp106Events.ChangingStalkMode += DisableStalk;
+                
+                Timing.CallDelayed(90f, () =>
+                {
+                    Scp106Events.UsingHunterAtlas -= DisableAtlas;
+                    Scp106Events.ChangingStalkMode -= DisableStalk;
+                });
                 break;
                 
                 void DisableAtlas(Scp106UsingHunterAtlasEventArgs ev)
@@ -80,6 +94,13 @@ public sealed class Stars(Config config) : CustomCard
             {
                 Scp939Events.CreatingAmnesticCloud += DisableCloud;
                 Scp939Events.MimickingEnvironment += DisableSpeaking;
+                
+                Timing.CallDelayed(90f, () =>
+                {
+                    Scp939Events.CreatingAmnesticCloud -= DisableCloud;
+                    Scp939Events.MimickingEnvironment -= DisableSpeaking;
+                });
+                
                 break;
                 void DisableCloud(Scp939CreatingAmnesticCloudEventArgs ev)
                 {
@@ -98,6 +119,12 @@ public sealed class Stars(Config config) : CustomCard
             case RoleTypeId.Scp173:
             {
                 Scp173Events.CreatingTantrum += DisableShitting;
+                
+                Timing.CallDelayed(90f, () =>
+                {
+                    Scp173Events.CreatingTantrum -= DisableShitting;
+                });
+                
                 break;
                 void DisableShitting(Scp173CreatingTantrumEventArgs ev)
                 {
@@ -109,6 +136,12 @@ public sealed class Stars(Config config) : CustomCard
             case RoleTypeId.Scp096:
             {
                 Scp096Events.Enraging += DisableScopophobia;
+                
+                Timing.CallDelayed(90f, () =>
+                {
+                    Scp096Events.Enraging -= DisableScopophobia;
+                });
+                
                 break;
                 void DisableScopophobia(Scp096EnragingEventArgs ev)
                 {
@@ -121,6 +154,12 @@ public sealed class Stars(Config config) : CustomCard
             {
                 Scp3114Events.Disguising += DisableDisguise;
                 Scp3114Events.StrangleStarting += DisableKinkyStrangling;
+                
+                Timing.CallDelayed(90f, () =>
+                {
+                    Scp3114Events.Disguising -= DisableDisguise;
+                    Scp3114Events.StrangleStarting -= DisableKinkyStrangling;
+                });
                 break;
                 void DisableDisguise(Scp3114DisguisingEventArgs ev)
                 {
@@ -136,6 +175,26 @@ public sealed class Stars(Config config) : CustomCard
                     ev.IsAllowed  = false;
                 }
             }
+        }
+
+        var delay = 60f;
+        if (player.IsSCP)
+        {
+            delay = 90f;
+        }
+        
+        PlayerEvents.Hurting += idkwhattonamethisshitanymoreman;
+        
+        Timing.CallDelayed(delay, () =>
+        {
+            PlayerEvents.Hurting -= idkwhattonamethisshitanymoreman;
+        });
+        return;
+
+        void idkwhattonamethisshitanymoreman(PlayerHurtingEventArgs ev) 
+        {
+            if (ev.Attacker !=  player) return;
+            ev.IsAllowed  = false;
         }
     }
 }
