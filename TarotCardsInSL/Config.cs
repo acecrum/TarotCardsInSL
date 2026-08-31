@@ -27,7 +27,6 @@ public class Config
     public int TowerSpawnWeight { get; set; } = 65;
     public int StarsSpawnWeight { get; set; } = 25;
     // this disables card lights from being able to spawn in, disable this if you want people to guess if its a tarot card or not
-    // or disable it if your server is already struggling.
     public bool EnableCardLights  { get; set; } = true;
     // Magician is disabled by default because when a player is using it, it looks like theyre rage hacking lol
     // enable natural spawns at your own risks, im not responsible for any players that maybe falsely banned with this card

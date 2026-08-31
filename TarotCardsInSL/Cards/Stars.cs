@@ -190,7 +190,7 @@ public sealed class Stars(Config config) : CustomCard
             PlayerEvents.Hurting -= Idkwhattonamethisshitanymoreman;
         });
 
-        var savedInventory = player.Inventory;
+        // var savedInventory = player.Inventory;
         
         if (player.IsHuman)
         {
