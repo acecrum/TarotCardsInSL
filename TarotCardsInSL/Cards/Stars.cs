@@ -9,6 +9,7 @@ using LabApi.Events.Handlers;
 using LabApi.Features.Wrappers;
 using MEC;
 using PlayerRoles;
+using Scp914;
 using UnityEngine;
 
 namespace TarotCardsInSL.Cards;
@@ -176,7 +177,7 @@ public sealed class Stars(Config config) : CustomCard
                 }
             }
         }
-
+        
         var delay = 60f;
         if (player.IsSCP)
         {
@@ -190,10 +191,9 @@ public sealed class Stars(Config config) : CustomCard
             PlayerEvents.Hurting -= Idkwhattonamethisshitanymoreman;
         });
 
-        var savedInventory = player.Inventory;
-        
-        if (player.IsHuman)
+        if (!player.IsHuman) return;
         {
+            var originalItems = player.Items.ToList();
             PlayerEvents.PickingUpItem += Denypickup;
             player.ClearInventory();
 
@@ -206,9 +206,23 @@ public sealed class Stars(Config config) : CustomCard
             Timing.CallDelayed(60f, () =>
             {
                 PlayerEvents.PickingUpItem -= Denypickup;
+                foreach (var itemType in originalItems)
+                {
+                    var processor = LabApi.Features.Wrappers.Scp914.GetItemProcessor(itemType.Type);
+                    if (processor == null)
+                    {
+                        player.AddItem(itemType.Type);
+                        continue;
+                    }
+                    var item = player.AddItem(itemType.Type);
+                    
+                    if (item == null) continue;
+                    
+                    processor.UpgradeItem(Scp914KnobSetting.Fine, item);
+                }
             });
         }
-        
+
         return;
         
         void Idkwhattonamethisshitanymoreman(PlayerHurtingEventArgs ev) 
@@ -216,7 +230,5 @@ public sealed class Stars(Config config) : CustomCard
             if (ev.Attacker !=  player) return;
             ev.IsAllowed  = false;
         }
-
-
     }
 }
