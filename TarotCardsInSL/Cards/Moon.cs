@@ -21,6 +21,12 @@ public sealed class Moon(Config config) : CustomCard
 
     public override void Activate(Player player)
     {
-        
+        if (player.IsAlive || player.CurrentlySpectating == null || player.CurrentlySpectating.IsSCP ||
+            player.CurrentlySpectating.IsTutorial && !config.EnableTutorialInteractions)
+        {
+            TarotHints.CardFailHint(player);
+            TarotPlugin.CardManager.RefundCard(player, this);
+            return;
+        }
     }
 }
