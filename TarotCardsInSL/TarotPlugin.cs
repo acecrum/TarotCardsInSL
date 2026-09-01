@@ -41,6 +41,7 @@ public class TarotPlugin : Plugin<Config>
         CardManager.RegisterCard(new Devil(Config));
         CardManager.RegisterCard(new Tower(Config));
         CardManager.RegisterCard(new Stars(Config));
+        CardManager.RegisterCard(new Moon(Config));
     }
     
     public override void Enable()
