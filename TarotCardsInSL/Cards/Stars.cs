@@ -29,206 +29,203 @@ public sealed class Stars(Config config) : CustomCard
 
     public override void Activate(Player player)
     {
-        switch (player.Role)
-        {
-            case RoleTypeId.Scp049:
-            {
-                Scp049Events.UsingSense += DisableGoodSense;
-                Scp049Events.UsingDoctorsCall += DisableDoctorCall;
-                Scp049Events.StartingResurrection += DisableRes;
-                
-                Timing.CallDelayed(90f, () =>
-                {
-                    Scp049Events.UsingSense -= DisableGoodSense;
-                    Scp049Events.UsingDoctorsCall -= DisableDoctorCall;
-                    Scp049Events.StartingResurrection -= DisableRes;
-                });
-                break;
-
-                void DisableGoodSense(Scp049UsingSenseEventArgs ev)
-                {
-                    if (ev.Player !=  player) return;
-                    
-                    ev.IsAllowed  = false;
-                }
-
-                void DisableDoctorCall(Scp049UsingDoctorsCallEventArgs ev)
-                {
-                    if (ev.Player !=  player) return;
-                    
-                    ev.IsAllowed  = false;
-                }
-
-                void DisableRes(Scp049StartingResurrectionEventArgs ev)
-                {
-                    if (ev.Player !=  player) return;
-                    
-                    ev.IsAllowed  = false;
-                }
-            }
-            case RoleTypeId.Scp106:
-            {
-                Scp106Events.UsingHunterAtlas += DisableAtlas;
-                Scp106Events.ChangingStalkMode += DisableStalk;
-                
-                Timing.CallDelayed(90f, () =>
-                {
-                    Scp106Events.UsingHunterAtlas -= DisableAtlas;
-                    Scp106Events.ChangingStalkMode -= DisableStalk;
-                });
-                break;
-                
-                void DisableAtlas(Scp106UsingHunterAtlasEventArgs ev)
-                {
-                    if (ev.Player !=  player) return;
-                    
-                    ev.IsAllowed  = false;
-                }
-
-                void DisableStalk(Scp106ChangingStalkModeEventArgs ev)
-                {
-                    if (ev.Player !=  player) return;
-                    ev.IsAllowed  = false;
-                }
-            }
-            case RoleTypeId.Scp939:
-            {
-                Scp939Events.CreatingAmnesticCloud += DisableCloud;
-                Scp939Events.MimickingEnvironment += DisableSpeaking;
-                
-                Timing.CallDelayed(90f, () =>
-                {
-                    Scp939Events.CreatingAmnesticCloud -= DisableCloud;
-                    Scp939Events.MimickingEnvironment -= DisableSpeaking;
-                });
-                
-                break;
-                void DisableCloud(Scp939CreatingAmnesticCloudEventArgs ev)
-                {
-                    if (ev.Player !=  player) return;
-                    
-                    ev.IsAllowed  = false;
-                }
-
-                void DisableSpeaking(Scp939MimickingEnvironmentEventArgs ev)
-                {
-                    if (ev.Player !=  player) return;
-                    
-                    ev.IsAllowed  = false;
-                }
-            }
-            case RoleTypeId.Scp173:
-            {
-                Scp173Events.CreatingTantrum += DisableShitting;
-                
-                Timing.CallDelayed(90f, () =>
-                {
-                    Scp173Events.CreatingTantrum -= DisableShitting;
-                });
-                
-                break;
-                void DisableShitting(Scp173CreatingTantrumEventArgs ev)
-                {
-                    if (ev.Player !=  player) return;
-                    
-                    ev.IsAllowed  = false;
-                }
-            }
-            case RoleTypeId.Scp096:
-            {
-                Scp096Events.Enraging += DisableScopophobia;
-                
-                Timing.CallDelayed(90f, () =>
-                {
-                    Scp096Events.Enraging -= DisableScopophobia;
-                });
-                
-                break;
-                void DisableScopophobia(Scp096EnragingEventArgs ev)
-                {
-                    if (ev.Player !=  player) return;
-                    
-                    ev.IsAllowed  = false;
-                }
-            }
-            case RoleTypeId.Scp3114:
-            {
-                Scp3114Events.Disguising += DisableDisguise;
-                Scp3114Events.StrangleStarting += DisableKinkyStrangling;
-                
-                Timing.CallDelayed(90f, () =>
-                {
-                    Scp3114Events.Disguising -= DisableDisguise;
-                    Scp3114Events.StrangleStarting -= DisableKinkyStrangling;
-                });
-                break;
-                void DisableDisguise(Scp3114DisguisingEventArgs ev)
-                {
-                    if (ev.Player !=  player) return;
-
-                    ev.IsAllowed = false;
-                }
-
-                void DisableKinkyStrangling(Scp3114StrangleStartingEventArgs ev)
-                {
-                    if (ev.Player !=  player) return;
-                    
-                    ev.IsAllowed  = false;
-                }
-            }
-        }
+        var duration = player.IsSCP ? 90f : 60f;
+        var savedItems = player.IsHuman ? player.Items.Select(item => item.Type).ToList() : new List<ItemType>();
         
-        var delay = 60f;
-        if (player.IsSCP)
-        {
-            delay = 90f;
-        }
-        
-        PlayerEvents.Hurting += Idkwhattonamethisshitanymoreman;
-        
-        Timing.CallDelayed(delay, () =>
-        {
-            PlayerEvents.Hurting -= Idkwhattonamethisshitanymoreman;
-        });
+        bool cleanedUp = false;
+        CoroutineHandle timer = default;
 
-        if (!player.IsHuman) return;
+        PlayerEvents.Death += OnDeath;
+        PlayerEvents.Hurting += BlockOutgoingDamage;
+        
+        SubscribeScpEvents();
+        
+        if (player.IsHuman)
         {
-            var originalItems = player.Items.ToList();
-            PlayerEvents.PickingUpItem += Denypickup;
+            PlayerEvents.PickingUpItem += DenyPickup;
             player.ClearInventory();
-
-            void Denypickup(PlayerPickingUpItemEventArgs ev)
-            {
-                if  (ev.Player !=  player) return;
-                ev.IsAllowed = false;
-            }
-            
-            Timing.CallDelayed(60f, () =>
-            {
-                PlayerEvents.PickingUpItem -= Denypickup;
-                foreach (var itemType in originalItems)
-                {
-                    var processor = LabApi.Features.Wrappers.Scp914.GetItemProcessor(itemType.Type);
-                    if (processor == null)
-                    {
-                        player.AddItem(itemType.Type);
-                        continue;
-                    }
-                    var item = player.AddItem(itemType.Type);
-                    
-                    if (item == null) continue;
-                    
-                    processor.UpgradeItem(Scp914KnobSetting.Fine, item);
-                }
-            });
         }
-
+        
+        timer = Timing.RunCoroutine(EffectTimer());
+        
         return;
         
-        void Idkwhattonamethisshitanymoreman(PlayerHurtingEventArgs ev) 
+        void OnDeath(PlayerDeathEventArgs ev)
         {
-            if (ev.Attacker !=  player) return;
-            ev.IsAllowed  = false;
+            if (ev.Player != player) return;
+            Cleanup();
+        }    
+        
+        void BlockOutgoingDamage(PlayerHurtingEventArgs ev)
+        {
+            if (ev.Attacker != player)
+                return;
+
+            ev.IsAllowed = false;
         }
+
+        void DenyPickup(PlayerPickingUpItemEventArgs ev)
+        {
+            if (ev.Player != player)
+                return;
+
+            ev.IsAllowed = false;
+        }
+        
+        IEnumerator<float> EffectTimer()
+        {
+            yield return Timing.WaitForSeconds(duration);
+
+            if (player.IsHuman)
+            {
+                RestoreInventory();
+            }
+
+            cleanedUp = false;
+        }
+                    
+            void Cleanup(bool killTimer = true)
+            {
+                if (cleanedUp)
+                    return;
+
+                cleanedUp = true;
+
+                if (killTimer && timer.IsValid)
+                    Timing.KillCoroutines(timer);
+
+                PlayerEvents.Death -= OnDeath;
+                PlayerEvents.Hurting -= BlockOutgoingDamage;
+                PlayerEvents.PickingUpItem -= DenyPickup;
+
+                Scp049Events.UsingSense -= DisableGoodSense;
+                Scp049Events.UsingDoctorsCall -= DisableDoctorCall;
+                Scp049Events.StartingResurrection -= DisableRes;
+
+                Scp106Events.UsingHunterAtlas -= DisableAtlas;
+                Scp106Events.ChangingStalkMode -= DisableStalk;
+
+                Scp939Events.CreatingAmnesticCloud -= DisableCloud;
+                Scp939Events.MimickingEnvironment -= DisableSpeaking;
+
+                Scp173Events.CreatingTantrum -= DisableShitting;
+
+                Scp096Events.Enraging -= DisableScopophobia;
+
+                Scp3114Events.Disguising -= DisableDisguise;
+                Scp3114Events.StrangleStarting -= DisableStrangle;
+            }
+            
+            void RestoreInventory()
+            {
+                PlayerEvents.PickingUpItem -= DenyPickup;
+
+                foreach (var itemType in savedItems)
+                {
+                    var processor = LabApi.Features.Wrappers.Scp914.GetItemProcessor(itemType);
+                    
+                    if (processor == null)
+                    {
+                        player.AddItem(itemType);
+                        continue;
+                    }
+                    var item = player.AddItem(itemType);
+
+                    if (item == null) continue;
+
+                    processor.UpgradeItem(Scp914KnobSetting.Fine, item);
+                }
+            }
+            
+            void SubscribeScpEvents()
+            {
+                switch (player.Role)
+                {
+                    case RoleTypeId.Scp049:
+                        Scp049Events.UsingSense += DisableGoodSense;
+                        Scp049Events.UsingDoctorsCall += DisableDoctorCall;
+                        Scp049Events.StartingResurrection += DisableRes;
+                        break;
+
+                    case RoleTypeId.Scp106:
+                        Scp106Events.UsingHunterAtlas += DisableAtlas;
+                        Scp106Events.ChangingStalkMode += DisableStalk;
+                        break;
+
+                    case RoleTypeId.Scp939:
+                        Scp939Events.CreatingAmnesticCloud += DisableCloud;
+                        Scp939Events.MimickingEnvironment += DisableSpeaking;
+                        break;
+
+                    case RoleTypeId.Scp173:
+                        Scp173Events.CreatingTantrum += DisableShitting;
+                        break;
+
+                    case RoleTypeId.Scp096:
+                        Scp096Events.Enraging += DisableScopophobia;
+                        break;
+
+                    case RoleTypeId.Scp3114:
+                        Scp3114Events.Disguising += DisableDisguise;
+                        Scp3114Events.StrangleStarting += DisableStrangle;
+                        break;
+                }
+            }
+            void DisableGoodSense(Scp049UsingSenseEventArgs ev)
+            {
+                if (ev.Player == player)
+                    ev.IsAllowed = false;
+            }
+            void DisableDoctorCall(Scp049UsingDoctorsCallEventArgs ev)
+            {
+                if (ev.Player == player)
+                    ev.IsAllowed = false;
+            }
+            void DisableRes(Scp049StartingResurrectionEventArgs ev)
+            {
+                if (ev.Player == player)
+                    ev.IsAllowed = false;
+            }
+            void DisableAtlas(Scp106UsingHunterAtlasEventArgs ev)
+            {
+                if (ev.Player == player)
+                    ev.IsAllowed = false;
+            }
+            void DisableStalk(Scp106ChangingStalkModeEventArgs ev)
+            {
+                if (ev.Player == player)
+                    ev.IsAllowed = false;
+            }
+            void DisableCloud(Scp939CreatingAmnesticCloudEventArgs ev)
+            {
+                if (ev.Player == player)
+                    ev.IsAllowed = false;
+            }
+            void DisableSpeaking(Scp939MimickingEnvironmentEventArgs ev)
+            {
+                if (ev.Player == player)
+                    ev.IsAllowed = false;
+            }
+            void DisableShitting(Scp173CreatingTantrumEventArgs ev)
+            {
+                if (ev.Player == player)
+                    ev.IsAllowed = false;
+            }
+
+            void DisableScopophobia(Scp096EnragingEventArgs ev)
+            {
+                if (ev.Player == player)
+                    ev.IsAllowed = false;
+            }
+            void DisableDisguise(Scp3114DisguisingEventArgs ev)
+            {
+                if (ev.Player == player)
+                    ev.IsAllowed = false;
+            }
+            void DisableStrangle(Scp3114StrangleStartingEventArgs ev)
+            {
+                if (ev.Player == player)
+                    ev.IsAllowed = false;
+            }
     }
 }

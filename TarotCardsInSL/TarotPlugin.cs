@@ -11,7 +11,6 @@ public class TarotPlugin : Plugin<Config>
     public override string Author => "acecrum";
     public override Version Version => new(1, 0, 0);
     public override Version RequiredApiVersion => new Version(1, 1, 7);
-
     public static CardManager CardManager { get; private set; } = null!;
     public static SubclassManager? SubclassManager { get; private set; }
     private EventHandlers? _eventHandlers;
