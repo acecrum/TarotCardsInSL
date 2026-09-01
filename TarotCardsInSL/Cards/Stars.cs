@@ -1,3 +1,4 @@
+using CustomPlayerEffects;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Arguments.Scp049Events;
 using LabApi.Events.Arguments.Scp096Events;
@@ -9,6 +10,8 @@ using LabApi.Events.Handlers;
 using LabApi.Features.Wrappers;
 using MEC;
 using PlayerRoles;
+using RueI.API;
+using RueI.API.Elements;
 using Scp914;
 using UnityEngine;
 
@@ -21,7 +24,7 @@ public sealed class Stars(Config config) : CustomCard
     public override CardType Type => CardType.Active;
     public override ItemType KeycardType => ItemType.KeycardCustomTaskForce;
     public override (int A, int B, int C) CardPerms => (0, 0, 3);
-    public override string TechnicalDescription => "<color=red>Removes every item from the players inventory and disables picking up.</color>\nAfter a minute, replaces them with direct upgrades.\nSCP's abilities and attacking is disabled for 90 seconds instead\nSCP's recieve a buff tailored to each SCP";
+    public override string TechnicalDescription => "<color=red>Removes every item from the players inventory and disables picking up.</color>\nAfter a minute, replaces them with direct upgrades.\nSCP's abilities and attacking is disabled for 90 seconds instead\nSCP's recieve either Damage Reduction or Speed";
     public override string Description => "Let go and find what you need.";
     public override Color GlowColor => new Color32(251, 225, 114, 255);
     public override int SpawnWeight => config.StarsSpawnWeight;
@@ -31,25 +34,58 @@ public sealed class Stars(Config config) : CustomCard
     {
         var duration = player.IsSCP ? 90f : 60f;
         var savedItems = player.IsHuman ? player.Items.Select(item => item.Type).ToList() : new List<ItemType>();
-        
-        bool cleanedUp = false;
+        var totalAmmo = player.Ammo.Values.Sum(x => (int)x);
+
+        var cleanedUp = false;
         CoroutineHandle timer = default;
 
         PlayerEvents.Death += OnDeath;
         PlayerEvents.Hurting += BlockOutgoingDamage;
-        
-        SubscribeScpEvents();
         
         if (player.IsHuman)
         {
             PlayerEvents.PickingUpItem += DenyPickup;
             player.ClearInventory();
         }
+        else
+        {
+            SubscribeScpEvents();
+        }
         
         timer = Timing.RunCoroutine(EffectTimer());
         
         return;
-        
+
+        ItemType? GetAmmoType(ItemType gun)
+        {
+            return gun switch
+            {
+                ItemType.GunCOM15 or
+                    ItemType.GunCOM18 or
+                    ItemType.GunCom45 or
+                    ItemType.GunCrossvec or
+                    ItemType.GunFSP9
+                    => ItemType.Ammo9x19,
+
+                ItemType.GunE11SR or
+                    ItemType.GunFRMG0
+                    => ItemType.Ammo556x45,
+
+                ItemType.GunAK or
+                    ItemType.GunA7 or
+                    ItemType.GunLogicer
+                    => ItemType.Ammo762x39,
+
+                ItemType.GunShotgun
+                    => ItemType.Ammo12gauge,
+
+                ItemType.GunRevolver
+                    => ItemType.Ammo44cal,
+
+                _ => null
+            };
+        }
+
         void OnDeath(PlayerDeathEventArgs ev)
         {
             if (ev.Player != player) return;
@@ -79,6 +115,10 @@ public sealed class Stars(Config config) : CustomCard
             if (player.IsHuman)
             {
                 RestoreInventory();
+            }
+            else
+            {
+                SCPBuffs();
             }
 
             cleanedUp = false;
@@ -134,6 +174,16 @@ public sealed class Stars(Config config) : CustomCard
                     if (item == null) continue;
 
                     processor.UpgradeItem(Scp914KnobSetting.Fine, item);
+
+                    var gunsByAmmo = player.Items.Select(item => GetAmmoType(item.Type)).OfType<ItemType>().GroupBy(ammo => ammo)
+                        .ToDictionary(group => group.Key, group => group.Count());
+                    if (gunsByAmmo.Count <= 0) continue;
+                    var ammoPerType = totalAmmo / gunsByAmmo.Count;
+
+                    foreach (var ammoType in gunsByAmmo)
+                    {
+                        player.SetAmmo(ammoType.Key,(ushort)ammoPerType);
+                    }
                 }
             }
             
@@ -171,6 +221,22 @@ public sealed class Stars(Config config) : CustomCard
                         break;
                 }
             }
+
+            void SCPBuffs()
+            {
+                switch (UnityEngine.Random.Range(0, 2))
+                {
+                    case 0:
+                        player.EnableEffect<MovementBoost>(20);
+                        RueDisplay.Get(player).Show(new BasicElement(200, $"<b><size=30><color={GlowColor.ToHex()}>20% Speed boost</color></size></b>"), 3f);
+                        break;
+                    case 1:
+                        player.EnableEffect<DamageReduction>(50);
+                        RueDisplay.Get(player).Show(new BasicElement(200, $"<b><size=30><color={GlowColor.ToHex()}>25% Damage Reduction</color></size></b>"), 3f);
+                        break;
+                }
+            }
+            
             void DisableGoodSense(Scp049UsingSenseEventArgs ev)
             {
                 if (ev.Player == player)

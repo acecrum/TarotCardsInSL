@@ -83,7 +83,7 @@ public sealed class Hermit(Config config) : CustomCard
                 break;
             case RoleTypeId.Tutorial:
                 if (!config.EnableTutorialInteractions) break;
-                switch (UnityEngine.Random.Range(0, 1))
+                switch (UnityEngine.Random.Range(0, 2))
                 {
                     case 0:
                         player.SetRole(RoleTypeId.ChaosConscript, RoleChangeReason.ItemUsage, RoleSpawnFlags.None);
