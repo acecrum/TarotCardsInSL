@@ -16,6 +16,7 @@ public sealed class Moon(Config config) : CustomCard
     public override string Description => "Bring them terror.";
     public override Color GlowColor => new Color32(123, 126, 186, 255);
     public override int SpawnWeight => config.MoonSpawnWeight;
+    public override bool KeepOnDeath => true;
 
 
     public override void Activate(Player player)

@@ -25,6 +25,7 @@ public abstract class CustomCard
     public virtual float GlowRange => .2f;
     public virtual float GlowIntensity => .25f;
     public virtual int SpawnWeight => 100;
+    public virtual bool KeepOnDeath => false;
 
     public virtual void Activate(Player player)
     {
