@@ -22,7 +22,8 @@ public sealed class Sun(Config config) : CustomCard
     
     private readonly Dictionary<string, SavedEffects> _savedEffects = new();
     private readonly Dictionary<string, LabEventHandler<PlayerChangingItemEventArgs>> _changingItemHandler = new();
-    private LightSourceToy? savedLight;
+    private readonly Dictionary<string, CoroutineHandle> _removeItemCoroutines = new();
+    private readonly Dictionary<string, LightSourceToy> _savedLights = new();
     private sealed class SavedEffects
     {
         public byte SpeedIntensity { get; init; }
@@ -32,14 +33,15 @@ public sealed class Sun(Config config) : CustomCard
     public override void OnGiven(Player player)
     { 
         var existingSpeed = player.ActiveEffects.OfType<MovementBoost>().FirstOrDefault();
-        
+
         _savedEffects[player.UserId] = new SavedEffects
         {
             SpeedIntensity = existingSpeed?.Intensity ?? 0,
             SpeedDuration = existingSpeed?.TimeLeft ?? 0,
         };
-        
-        Timing.RunCoroutine(RemoveHeldItem(player));
+
+        var handle = Timing.RunCoroutine(RemoveHeldItem(player));
+        _removeItemCoroutines[player.UserId] = handle;
         
         return;
         
@@ -60,9 +62,11 @@ public sealed class Sun(Config config) : CustomCard
             light.Intensity = 1.5f;
             light.Range = 5f;
             light.Spawn();
-            savedLight = light;
+            _savedLights[player.UserId] = light;
             
             player.EnableEffect<MovementBoost>(35);
+            
+            _removeItemCoroutines.Remove(player.UserId);
         }
         
         void DenyItemSwap(PlayerChangingItemEventArgs ev)
@@ -74,12 +78,29 @@ public sealed class Sun(Config config) : CustomCard
     }
     public override void OnRemoved(Player player)
     {
-        if (!_savedEffects.TryGetValue(player.UserId, out var saved)) return;
-        if (!_changingItemHandler.TryGetValue(player.UserId, out var handler)) return;
-        player.EnableEffect<MovementBoost>(saved.SpeedIntensity, saved.SpeedDuration);
-        _savedEffects.Remove(player.UserId);
-        
-        PlayerEvents.ChangingItem -= handler;
-        savedLight?.Destroy();
+        if (_removeItemCoroutines.TryGetValue(player.UserId, out var coroutine))
+        {
+            Timing.KillCoroutines(coroutine);
+            _removeItemCoroutines.Remove(player.UserId);
+        }
+
+        if (_savedEffects.TryGetValue(player.UserId, out var saved))
+        {
+            player.EnableEffect<MovementBoost>(
+                saved.SpeedIntensity,
+                saved.SpeedDuration);
+
+            _savedEffects.Remove(player.UserId);
+        }
+
+        if (_changingItemHandler.TryGetValue(player.UserId, out var handler))
+        {
+            PlayerEvents.ChangingItem -= handler;
+            _changingItemHandler.Remove(player.UserId);
+        }
+
+        if (!_savedLights.TryGetValue(player.UserId, out var light)) return;
+        light.Destroy();
+        _savedLights.Remove(player.UserId);
     }
 }

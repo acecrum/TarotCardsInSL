@@ -58,14 +58,18 @@ public sealed class Moon(Config config) : CustomCard
                 yield return Timing.WaitForSeconds(1f);
                 timer--;
             }
-            PlayerEvents.ChangingItem -= DenyChanging; // todo: TEST THIS SHIT IN GAME
+            PlayerEvents.ChangingItem -= DenyChanging;
             PlayerEvents.PickingUpItem -= DenyPickingUp;
+
+            Timing.KillCoroutines();
         }
 
         void DiscardDeezNutz(PlayerDeathEventArgs ev)
         {
             if (ev.Player != savedTarget) return;
-            Timing.KillCoroutines(Timing.RunCoroutine(Timer()));
+            PlayerEvents.ChangingItem -= DenyChanging;
+            PlayerEvents.PickingUpItem -= DenyPickingUp;
+            Timing.KillCoroutines();
         }
 
         void DenyChanging(PlayerChangingItemEventArgs ev)
