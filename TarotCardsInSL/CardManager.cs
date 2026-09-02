@@ -138,7 +138,6 @@ public class CardManager(Config config)
     public void DropCard(Player player, Vector3 position)
     {
         if (!_heldCard.TryGetValue(player.UserId, out var card)) return;
-        if (card.KeepOnDeath) return;
         card.OnRemoved(player);
         SpawnCard(card, position);
         _heldCard.Remove(player.UserId);

@@ -23,7 +23,7 @@ public sealed class Stars(Config config) : CustomCard
     public override string Name => "XVII | The Stars";
     public override CardType Type => CardType.Active;
     public override ItemType KeycardType => ItemType.KeycardCustomTaskForce;
-    public override (int A, int B, int C) CardPerms => (0, 0, 3);
+    public override (int A, int B, int C) CardPerms => (2, 1, 3);
     public override string TechnicalDescription => "<color=red>Removes every item from the players inventory and disables picking up.</color>\nAfter a minute, replaces them with direct upgrades.\nSCP's abilities and attacking is disabled for 90 seconds instead\nSCP's recieve either Damage Reduction or Speed";
     public override string Description => "Let go and find what you need.";
     public override Color GlowColor => new Color32(251, 225, 114, 255);

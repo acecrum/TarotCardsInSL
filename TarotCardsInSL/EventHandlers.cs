@@ -101,8 +101,13 @@ public sealed class EventHandlers(CardManager cardManager, TarotDatastoring data
 
     private void OnPlayerDeath(PlayerDeathEventArgs ev)
     {
-        cardManager.DropCard(ev.Player, ev.OldPosition);
         subclassManager.TarotMasterDropCards(ev.Player);
+        
+        if (!cardManager.TryGetHeldCard(ev.Player, out var card)) return;
+        if (!card.KeepOnDeath)
+        {
+            cardManager.DropCard(ev.Player, ev.OldPosition);
+        }
     }
 
     private void OnRoundStarted()

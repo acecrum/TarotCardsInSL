@@ -10,7 +10,7 @@ public sealed class Emperor(Config config) : CustomCard
     public override string ID => "emperor";
     public override string Name => "IV | The Emperor";
     public override CardType Type => CardType.Active;
-    public override ItemType KeycardType => ItemType.KeycardCustomTaskForce;
+    public override ItemType KeycardType => ItemType.KeycardCustomManagement;
     public override (int A, int B, int C) CardPerms => (0, 3, 0);
     public override string TechnicalDescription => "Increases defense massively but slows you down for 10 seconds.";
     public override string Description => "Challenge me!";

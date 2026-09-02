@@ -16,7 +16,7 @@ public sealed class Devil(Config config) : CustomCard
     public override string ID => "devil";
     public override string Name => "XV | The Devil";
     public override CardType Type => CardType.Active;
-    public override ItemType KeycardType => ItemType.KeycardCustomMetalCase;
+    public override ItemType KeycardType => ItemType.KeycardCustomSite02;
     public override (int A, int B, int C) CardPerms => (1, 2, 1);
     public override string TechnicalDescription => "On activation, starts a timer that <color=red>kills you when it reaches 0.</color>\nYou deal 1.5x damage and recieve a 35% Movement Boost\nKilling players regenerates HP and grants further buffs.";
     public override string Description => "Deal with the Devil.";

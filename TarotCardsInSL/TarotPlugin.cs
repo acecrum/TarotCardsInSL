@@ -7,7 +7,7 @@ namespace TarotCardsInSL;
 public class TarotPlugin : Plugin<Config>
 {
     public override string Name => "TarotCardsInSL";
-    public override string Description => "Adds Tarot Cards into SL";
+    public override string Description => "Adds Major Arcana Cards into SL";
     public override string Author => "acecrum";
     public override Version Version => new(1, 0, 0);
     public override Version RequiredApiVersion => new Version(1, 1, 7);
@@ -42,6 +42,7 @@ public class TarotPlugin : Plugin<Config>
         CardManager.RegisterCard(new Tower(Config));
         CardManager.RegisterCard(new Stars(Config));
         CardManager.RegisterCard(new Moon(Config));
+        CardManager.RegisterCard(new Sun(Config));
     }
     
     public override void Enable()
