@@ -34,18 +34,14 @@ public sealed class Moon(Config config) : CustomCard
         
         PlayerEvents.ChangingItem += DenyChanging;
         PlayerEvents.PickingUpItem += DenyPickingUp;
+        PlayerEvents.Death += DiscardDeezNutz;
 
         var room = savedTarget?.Room;
 
         room?.LightController?.FlickerLights(25f);
         
         Timing.RunCoroutine(Timer());
-
-        Timing.CallDelayed(60f, () =>
-        {
-            PlayerEvents.ChangingItem -= DenyChanging;
-            PlayerEvents.PickingUpItem -= DenyPickingUp;
-        });
+        
         return;
 
         IEnumerator<float> Timer()
@@ -62,6 +58,14 @@ public sealed class Moon(Config config) : CustomCard
                 yield return Timing.WaitForSeconds(1f);
                 timer--;
             }
+            PlayerEvents.ChangingItem -= DenyChanging; // todo: TEST THIS SHIT IN GAME
+            PlayerEvents.PickingUpItem -= DenyPickingUp;
+        }
+
+        void DiscardDeezNutz(PlayerDeathEventArgs ev)
+        {
+            if (ev.Player != savedTarget) return;
+            Timing.KillCoroutines(Timing.RunCoroutine(Timer()));
         }
 
         void DenyChanging(PlayerChangingItemEventArgs ev)
