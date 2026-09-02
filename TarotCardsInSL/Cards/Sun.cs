@@ -1,5 +1,9 @@
 using CustomPlayerEffects;
+using LabApi.Events;
+using LabApi.Events.Arguments.PlayerEvents;
+using LabApi.Events.Handlers;
 using LabApi.Features.Wrappers;
+using MEC;
 using UnityEngine;
 
 namespace TarotCardsInSL.Cards;
@@ -17,40 +21,65 @@ public sealed class Sun(Config config) : CustomCard
     public override int SpawnWeight => config.FoolSpawnWeight;
     
     private readonly Dictionary<string, SavedEffects> _savedEffects = new();
+    private readonly Dictionary<string, LabEventHandler<PlayerChangingItemEventArgs>> _changingItemHandler = new();
+    private LightSourceToy? savedLight;
     private sealed class SavedEffects
     {
         public byte SpeedIntensity { get; init; }
         public float SpeedDuration { get; init; }
-
-        public byte DrIntensity { get; init; }
-        public float DrDuration { get; init; }
     }
 
     public override void OnGiven(Player player)
     { 
-        var existingSpeed = player.ActiveEffects.OfType<MovementBoost>().FirstOrDefault(); 
-        var existingDr = player.ActiveEffects.OfType<DamageReduction>().FirstOrDefault();
+        var existingSpeed = player.ActiveEffects.OfType<MovementBoost>().FirstOrDefault();
         
         _savedEffects[player.UserId] = new SavedEffects
         {
             SpeedIntensity = existingSpeed?.Intensity ?? 0,
             SpeedDuration = existingSpeed?.TimeLeft ?? 0,
-
-            DrIntensity = existingDr?.Intensity ?? 0,
-            DrDuration = existingDr?.TimeLeft ?? 0
         };
         
-        player.EnableEffect<MovementBoost>(15);
-        player.EnableEffect<DamageReduction>(40);
+        Timing.RunCoroutine(RemoveHeldItem(player));
+        
+        return;
+        
+        IEnumerator<float> RemoveHeldItem(Player player)
+        {
+            while (player.CurrentItem != null)
+            {
+                player.CurrentItem = null;
+
+                yield return Timing.WaitForSeconds(0.1f);
+            }
+            
+            _changingItemHandler[player.UserId] = DenyItemSwap;
+            PlayerEvents.ChangingItem += DenyItemSwap;
+            
+            var light = LightSourceToy.Create(player.GameObject?.transform, networkSpawn: false);
+            light.Color = GlowColor;
+            light.Intensity = 1.5f;
+            light.Range = 5f;
+            light.Spawn();
+            savedLight = light;
+            
+            player.EnableEffect<MovementBoost>(35);
+        }
+        
+        void DenyItemSwap(PlayerChangingItemEventArgs ev)
+        {
+            if (ev.Player !=  player) return;
+
+            ev.IsAllowed = false;
+        }
     }
     public override void OnRemoved(Player player)
     {
-        if (!_savedEffects.TryGetValue(player.UserId, out var saved))
-            return;
-        
+        if (!_savedEffects.TryGetValue(player.UserId, out var saved)) return;
+        if (!_changingItemHandler.TryGetValue(player.UserId, out var handler)) return;
         player.EnableEffect<MovementBoost>(saved.SpeedIntensity, saved.SpeedDuration);
-        player.EnableEffect<DamageReduction>(saved.DrIntensity, saved.DrDuration);
-
         _savedEffects.Remove(player.UserId);
+        
+        PlayerEvents.ChangingItem -= handler;
+        savedLight?.Destroy();
     }
 }
