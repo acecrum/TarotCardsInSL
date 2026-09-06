@@ -75,7 +75,7 @@ public sealed class Chariot(Config config) : CustomCard
 
             if (DamageEv.Player != savedAttacker)
             {
-                handler.Damage = 0f;
+                DamageEv.IsAllowed = false;
             }
         }
 

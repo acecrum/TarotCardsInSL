@@ -55,7 +55,7 @@ public sealed class SubclassManager(CardManager cardManager, Config config)
     }
 
     // used in normal gameplay and in ra to skip valid role checks
-    public void AssignMaster(Player player) // todo: use tophat instead of light
+    public void AssignMaster(Player player)
     {
         _master[player.UserId] = new TarotMaster(player, config);
         TarotHints.TarotMasterHint(player);
