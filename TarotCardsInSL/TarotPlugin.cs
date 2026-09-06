@@ -43,6 +43,7 @@ public class TarotPlugin : Plugin<Config>
         CardManager.RegisterCard(new Stars(Config));
         CardManager.RegisterCard(new Moon(Config));
         CardManager.RegisterCard(new Sun(Config));
+        CardManager.RegisterCard(new Judgement(Config));
     }
     
     public override void Enable()

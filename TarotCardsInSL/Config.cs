@@ -28,6 +28,7 @@ public class Config
     public int StarsSpawnWeight { get; set; } = 25;
     public int MoonSpawnWeight { get; set; } = 50;
     public int SunSpawnWeight { get; set; } = 25;
+    public int JudgementSpawnWeight { get; set; } = 15;
     // this disables card lights from being able to spawn in, disable this if you want people to guess if its a tarot card or not
     public bool EnableCardLights  { get; set; } = true;
     // Magician is disabled by default because when a player is using it, it looks like theyre rage hacking lol

@@ -20,7 +20,7 @@ public sealed class Sun(Config config) : CustomCard
     public override string TechnicalDescription => "<color=red>Disables attacking and using items.</color>\nIn return, creates a passive healing AOE for you and teammates,\nyou're also granted +35% speed and teammates get a 10% damage boost.";
     public override string Description => "Bring them hope.";
     public override Color GlowColor => Color.yellow;
-    public override int SpawnWeight => config.FoolSpawnWeight;
+    public override int SpawnWeight => config.SunSpawnWeight;
     
     private readonly Dictionary<string, SavedEffects> _savedEffects = new();
     private readonly Dictionary<string, LabEventHandler<PlayerChangingItemEventArgs>> _changingItemHandler = new();
