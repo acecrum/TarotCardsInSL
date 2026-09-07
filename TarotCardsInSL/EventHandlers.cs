@@ -5,6 +5,7 @@ using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Events.Handlers;
 using LabApi.Features.Wrappers;
 using Mirror;
+using NetworkManagerUtils.Dummies;
 using PlayerRoles;
 using TarotCardsInSL.Cards;
 using TarotCardsInSL.Spawning;
@@ -39,6 +40,7 @@ public sealed class EventHandlers(CardManager cardManager, TarotDatastoring data
         PlayerEvents.ChangedRole += OnChangedRole;
         PlayerEvents.Joined += OnJoined;
         PlayerEvents.Left += OnLeft;
+        PlayerEvents.Dying += OnDying;
         ServerEvents.WaveRespawned += OnWaveRespawned;
         Scp049Events.ResurrectedBody += On049Resurrected;
         Scp914Events.ProcessingPickup += OnProcessingPickup;
@@ -101,13 +103,16 @@ public sealed class EventHandlers(CardManager cardManager, TarotDatastoring data
 
     private void OnPlayerDeath(PlayerDeathEventArgs ev)
     {
-        subclassManager.TarotMasterDropCards(ev.Player);
-        
         if (!cardManager.TryGetHeldCard(ev.Player, out var card)) return;
         if (!card.KeepOnDeath)
         {
             cardManager.DropCard(ev.Player, ev.OldPosition);
         }
+    }
+
+    private void OnDying(PlayerDyingEventArgs ev)
+    {
+        subclassManager.TarotMasterDropCards(ev.Player);
     }
 
     private void OnRoundStarted()
@@ -132,7 +137,6 @@ public sealed class EventHandlers(CardManager cardManager, TarotDatastoring data
     private void OnChangedRole(PlayerChangedRoleEventArgs ev)
     {
         TarotHints.ScpPickUpHint(ev.Player, config);
-        TarotHints.Scp079Hint(ev.Player, config);
         switch (ev.ChangeReason)
         {
             case RoleChangeReason.Escaped when subclassManager.IsTarotMaster(ev.Player):

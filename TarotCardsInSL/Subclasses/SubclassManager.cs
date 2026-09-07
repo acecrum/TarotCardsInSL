@@ -45,13 +45,12 @@ public sealed class SubclassManager(CardManager cardManager, Config config)
     }
 
     // used in normal gameplay
-    public bool TryAssignMaster(Player player)
+    public void TryAssignMaster(Player player)
     {
-        if (_master.Count > config.TarotMasterSpawnCap) return false;
-        if (!CanBecomeMaster(player)) return false;
-        if (UnityEngine.Random.value > config.TarotMasterSpawnChance) return false;
+        if (_master.Count >= config.TarotMasterSpawnCap) return;
+        if (!CanBecomeMaster(player)) return;
+        if (UnityEngine.Random.value > config.TarotMasterSpawnChance) return;
         AssignMaster(player);
-        return true;
     }
 
     // used in normal gameplay and in ra to skip valid role checks
@@ -121,6 +120,8 @@ public sealed class SubclassManager(CardManager cardManager, Config config)
     
     private void TryCraftCard(Player master)
     {
+        //if (!master.IsAlive) return;
+        
         var target = GetNearbyTeammate(master);
         if (target == null) return;
 
