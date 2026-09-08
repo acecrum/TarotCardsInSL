@@ -8,7 +8,7 @@ public class RemoveCard : ICommand, IUsageProvider
 {
     public string Command => "removecard";
     public string[] Aliases => ["rmc"];
-    public string Description => "Removes a players Tarot Card if they have one";
+    public string Description => "Removes a player's Tarot Card if they have one";
     public string[] Usage => ["PlayerID"];
 
     public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
