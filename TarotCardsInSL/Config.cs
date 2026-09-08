@@ -4,10 +4,6 @@ namespace TarotCardsInSL;
 
 public class Config
 {
-    // enables or disables the plugin.
-    public bool IsEnabled { get; set; } = true;
-    // activates debug mode for the plugin
-    public bool Debug { get; set; } = false;
     public int FoolSpawnWeight { get; set; } = 80;
     public int PriestessSpawnWeight { get; set; } = 75;
     public int EmperorSpawnWeight { get; set; } = 50;
@@ -57,6 +53,6 @@ public class Config
     // if other plugins utilize the Tutorial class for gameplay/non admin reasons you can change this to true and card interactions will be able to work with Tutorials
     // this also allows tarot master to spawn for Tutorials
     public bool EnableTutorialInteractions  { get; set; } = false;
-    // This allows SCP's to grab and use tarot cards, toggle this to false if you do not want SCP's to be able to grab any cards. (this disables the scp pick up hint as well)
+    // this allows SCP's to grab and use tarot cards, toggle this to false if you do not want SCP's to be able to grab any cards. (this disables the scp pick up hint as well)
     public bool EnableScpPickUp { get; set; } = true;
 }
