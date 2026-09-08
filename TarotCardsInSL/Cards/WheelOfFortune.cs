@@ -51,7 +51,7 @@ public sealed class WheelOfFortune(Config config) : CustomCard
                 else
                 {
                     TimedGrenadeProjectile.SpawnActive(player.Position, ItemType.GrenadeHE, Player.Host, 0.01f);
-                    player.Kill("https://www.youtube.com/watch?v=vpVFz_R3PeY");
+                    player.Kill("Rolled their heart out.");
                 }
                 return;
             case < 15:

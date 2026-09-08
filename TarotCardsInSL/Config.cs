@@ -36,7 +36,7 @@ public class Config
     public bool EnableMagician { get; set; } = false;
     public int MagicianSpawnWeight { get; set; } = 0;
     // this is the spawn chance for a tarot master, what else can i say. set this to 0f to disable tarot master spawning
-    public float TarotMasterSpawnChance { get; set; } = 0.07f;
+    public float TarotMasterSpawnChance { get; set; } = 0.05f;
     // this is the spawn cap for the amount of tarot masters that can be alive in a round, increasing this allows for more to spawn. setting this to 0 also disables master spawning.
     public int TarotMasterSpawnCap { get; set; } = 1;
     // this is the card crafting time for the tarot master, mininum is the lowest time it takes to create a card, maximum is the highest time to craft a card.
@@ -57,6 +57,6 @@ public class Config
     // if other plugins utilize the Tutorial class for gameplay/non admin reasons you can change this to true and card interactions will be able to work with Tutorials
     // this also allows tarot master to spawn for Tutorials
     public bool EnableTutorialInteractions  { get; set; } = false;
-    // This allows SCP's to grab and use tarot cards, toggle this to false if you do not want SCP's to be able to grab any cards. (this also disables 079's self crafting along with the scp pick up hint)
+    // This allows SCP's to grab and use tarot cards, toggle this to false if you do not want SCP's to be able to grab any cards. (this disables the scp pick up hint as well)
     public bool EnableScpPickUp { get; set; } = true;
 }

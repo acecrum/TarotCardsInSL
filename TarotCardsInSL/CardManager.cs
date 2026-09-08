@@ -165,9 +165,8 @@ public class CardManager(Config config)
 
     public bool RefundCard(Player player, CustomCard card)
     {
-        if (_heldCard.ContainsKey(player.UserId)) return false;
+        if (!_heldCard.TryAdd(player.UserId, card)) return false;
 
-        _heldCard[player.UserId] = card;
         TarotHints.ShowHeldCardHint(player, card);
         TarotHints.CardFailHint(player);
         return true;

@@ -36,7 +36,6 @@ public class TarotPlugin : Plugin<Config>
         CardManager.RegisterCard(new Strength(Config));
         CardManager.RegisterCard(new HangedMan(Config));
         CardManager.RegisterCard(new Death(Config));
-        CardManager.RegisterCard(new World(Config));
         CardManager.RegisterCard(new Temperance(Config));
         CardManager.RegisterCard(new Devil(Config));
         CardManager.RegisterCard(new Tower(Config));
@@ -44,6 +43,7 @@ public class TarotPlugin : Plugin<Config>
         CardManager.RegisterCard(new Moon(Config));
         CardManager.RegisterCard(new Sun(Config));
         CardManager.RegisterCard(new Judgement(Config));
+        CardManager.RegisterCard(new World(Config));
     }
     
     public override void Enable()

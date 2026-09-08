@@ -5,7 +5,6 @@ using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Events.Handlers;
 using LabApi.Features.Wrappers;
 using Mirror;
-using NetworkManagerUtils.Dummies;
 using PlayerRoles;
 using TarotCardsInSL.Cards;
 using TarotCardsInSL.Spawning;
@@ -164,7 +163,7 @@ public sealed class EventHandlers(CardManager cardManager, TarotDatastoring data
         foreach (var key in keys) _keybindStates.Remove(key);
     }
 
-    private void OnProcessingPickup(Scp914ProcessingPickupEventArgs ev)
+    private static void OnProcessingPickup(Scp914ProcessingPickupEventArgs ev)
     {
         var groundCard = ev.Pickup.GameObject.GetComponent<Groundcard>();
         if (groundCard == null) return;
