@@ -1,6 +1,7 @@
 # Tarot Cards In SCP: Secret Laboratory
 
 ## This plugin requires [RueI](https://github.com/pawslee/RueI/releases/)
+Download it and put it inside your plugins folder for the plugin to work.
 
 ## Cards
 All 22 Major Arcana Tarot cards are added in this plugin and there is support for all humans and nearly every SCP ([SCP-079 is excluded is due to issues with ServerSpecific Inputs for them](https://github.com/northwood-studios/LabAPI/issues/453)).
