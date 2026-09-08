@@ -36,4 +36,4 @@ Certain Tarot cards will have different effects for SCPs compared to humans.
 
 ### This is my first long term SCP:SL plugin I've done so feedback is welcome with open arms, and please make a bug report if you encounter any bugs!
 
-### Also thanks to my very willing testers for helping me kink out any issues I found along the way. (Under, Neb, Lad, and F.B.I) Thank you all so much!
+### Also thanks to my very willing testers for helping me kink out any issues I found along the way. (Under, Lad, Neb, and F.B.I) Thank you all so much!
