@@ -21,7 +21,7 @@ public sealed class Temperance(Config config) : CustomCard
     public override Color GlowColor => Color.green;
     public override int SpawnWeight => config.TemperanceSpawnWeight;
 
-    public override void Activate(Player player) // todo: add more effects but these are good imo
+    public override void Activate(Player player)
     {
         var badEffectString = "";
         var goodEffectString = "";

@@ -97,7 +97,7 @@ public class TarotHints
     
     public static void CardFailHint(Player player)
     {
-        RueDisplay.Get(player).Show(new BasicElement(165, "<align=right><b><size=24><color=red>Nope!</color></size></b></align>"), 3f);
+        RueDisplay.Get(player).Show(new BasicElement(165, "<align=right><b><size=24><color=red>Nope!</color></size></b></align>"), 0.5f);
     }
     
     public static void ClearPickupCardHint(Player player)
