@@ -30,6 +30,8 @@ public class Config
     // Magician is disabled by default because when a player is using it, it looks like theyre rage hacking lol
     // enable natural spawns at your own risks, im not responsible for any players that maybe falsely banned with this card
     public bool EnableMagician { get; set; } = false;
+    // this card does nothing. enable to be disapointed. 
+    public bool EnableDebugCard { get; set; } = false;
     public int MagicianSpawnWeight { get; set; } = 0;
     // this is the spawn chance for a tarot master, what else can i say. set this to 0f to disable tarot master spawning
     public float TarotMasterSpawnChance { get; set; } = 0.05f;

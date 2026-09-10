@@ -19,7 +19,10 @@ public class TarotPlugin : Plugin<Config>
     private void RegisterCards()
     {
         CardManager.RegisterCard(new Fool(Config));
-        CardManager.RegisterCard(new DebugCard());
+        if (Config.EnableDebugCard)
+        {
+            CardManager.RegisterCard(new DebugCard());
+        }
         if (Config.EnableMagician)
         {
             CardManager.RegisterCard(new Magician(Config));

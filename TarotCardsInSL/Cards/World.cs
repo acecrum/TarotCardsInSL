@@ -41,7 +41,7 @@ public sealed class World(Config config) : CustomCard
             target = enemies[UnityEngine.Random.Range(0, enemies.Count)];
         }
 
-        if (target == null)
+        if (target == null || player.CurrentItem is { Type: ItemType.MicroHID })
         {
             TarotPlugin.CardManager.RefundCard(player, this);
             return;

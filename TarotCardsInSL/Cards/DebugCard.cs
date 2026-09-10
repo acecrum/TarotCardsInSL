@@ -18,6 +18,5 @@ public sealed class DebugCard : CustomCard
 
     public override void Activate(Player player)
     {
-        player.CurrentItem = null;
     }
 }
